@@ -123,7 +123,7 @@ class Blockchain:
         """
 
         parsed_url = urlparse(address)
-        self.nodes.add(parsed_url)
+        self.nodes.add(parsed_url.netloc)
 
     def valid_chain(self, chain):
         """
