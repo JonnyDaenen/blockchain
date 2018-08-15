@@ -36,7 +36,7 @@ def new_transation():
 
     # check that all required fields are present
     required_fields = ["sender", "recipient", "amount"]
-    if not all(k in values for k in required_fields):
+    if not values or not all(k in values for k in required_fields):
         return 'Missing values', 400
 
     # add transaction
