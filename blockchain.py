@@ -97,7 +97,6 @@ class Blockchain:
 
         return proof
 
-
     @staticmethod
     def valid_proof(last_proof, proof):
         """
@@ -111,6 +110,38 @@ class Blockchain:
         guess = f'{last_proof}{proof}'.encode()
         guess_hash = hashlib.sha256(guess).hexdigest()
         return guess_hash[:4] == "0000"
+
+    def valid_chain(self, chain):
+        """
+        Determine if a given blockchain is valid
+
+        :param chain: <list> A blockchain
+        :return: <bool> True if valid, False if not
+        """
+
+        # skip first block
+        last_block = chain[0]
+        current_index = 1
+
+        while current_index < len(chain):
+            block = chain[current_index]
+            print(f'{last_block}')
+            print(f'{block}')
+            print("\n" + "-"*10 + "\n")
+
+            # validate hash
+            if block['previous_hash'] != self.hash(last_block):
+                return False
+
+            # validate proof of work
+            if not self.valid_proof(last_block['proof'], block['proof']):
+                return False
+
+            last_block = block
+            current_index += 1
+
+        return True
+
 
 
 
