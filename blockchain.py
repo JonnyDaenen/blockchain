@@ -1,4 +1,4 @@
-
+from time import time
 
 
 class Blockchain:
@@ -7,9 +7,34 @@ class Blockchain:
         self.chain = []
         self.current_transactions = []
 
-    def new_block(self):
-        # Creates a new block and adds to chain
-        pass
+        # Create the genesis block for this chain
+        self.new_block(previous_hash=1, proof=100)
+
+    def new_block(self, proof, previous_hash=None):
+        """
+        Create new block in the blockchain
+        :param proof: <int> The proof given by the Proof of Work algorithm
+        :param previous_hash: (Optional) <str> Hash of precious block
+        :return: <dict> New block
+        """
+
+        # construct the block
+        block = {
+            'index': len(self.chain) + 1,  # QUESTION: why not calculate using last_block?
+            'timestamp': time(),  # epoch time
+            'transactions': self.current_transactions,
+            'proof': proof,
+            'previous_hash': previous_hash or self.hash(self.chain[-1]),  # fallback to manual hash creation
+        }
+
+        # empty the transactions
+        self.current_transactions = []
+
+        # append the block to the chain
+        self.chain.append(block)
+
+        # return the block
+        return block
 
     def new_transaction(self, sender, recipient, amount):
         """
