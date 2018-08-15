@@ -1,5 +1,7 @@
 import hashlib
 import json
+from urllib.parse import urlparse
+
 import requests
 
 from time import time
@@ -112,6 +114,16 @@ class Blockchain:
         guess = f'{last_proof}{proof}'.encode()
         guess_hash = hashlib.sha256(guess).hexdigest()
         return guess_hash[:4] == "0000"
+
+    def register_node(self, address):
+        """
+        Add a new node to the set of nodes
+        :param address: <str> Address of the node, e.g., 'http://127.0.0.1:5001'
+        :return: None
+        """
+
+        parsed_url = urlparse(address)
+        self.nodes.add(parsed_url)
 
     def valid_chain(self, chain):
         """
