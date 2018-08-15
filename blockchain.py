@@ -1,5 +1,7 @@
 import hashlib
 import json
+import requests
+
 from time import time
 
 
@@ -143,6 +145,38 @@ class Blockchain:
         return True
 
 
+    def resolve_conflicts(self):
+        """
+        This is the consensus algorithm; it resolves conflicts
+        by replacing our chain with the longest one in the network
+
+        :return: <bool> True if our chain was replaces, False if not
+        """
+
+        neighbours = self.nodes
+        new_chain = None
+
+        # only look for longer changes
+        max_length = len(self.chain)
+
+        # get all the chains
+        for node in neighbours:
+            response = requests.get(f'http://{node}/chain')
+
+            if response.status_code == 200:
+                length = response.json()['length']
+                chain = response.json()['chain']
+
+                # QUESTION: what if we have multiple chains of the same length?
+                # check length
+                if length > max_length and self.valid_chain(chain):
+                    max_length = length
+                    new_chain = chain
 
 
+        if new_chain:
+            self.chain = new_chain
+            return True
+
+        return False
 
