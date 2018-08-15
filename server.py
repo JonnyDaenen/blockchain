@@ -20,7 +20,7 @@ def mine():
     return "We'll mine a new block"
 
 
-@app.route('transactions/new', methods=['POST'])
+@app.route('/transactions/new', methods=['POST'])
 def new_transation():
     return "We'll add a new transaction"
 
