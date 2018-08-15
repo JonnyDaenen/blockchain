@@ -1,3 +1,5 @@
+import hashlib
+import json
 from time import time
 
 
@@ -57,8 +59,18 @@ class Blockchain:
 
     @staticmethod
     def hash(block):
-        # Hashes a block
-        pass
+        """
+        Creates a SHA-256 hash of a Block
+
+        :param block: <dict> Block
+        :return: <str> Hash of the block
+        """
+
+        # serialize dictionary to a string
+        # ! we make sure it is ordered to keep consistency!
+        block_string = json.dumps(block, sort_keys=True).encode()  # QUESTION: why the encode step?
+        return hashlib.sha256(block_string).hexdigest()
+
 
     @property
     def last_block(self):
