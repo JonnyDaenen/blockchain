@@ -7,20 +7,18 @@ from blockchain import Blockchain
 app = Flask(__name__)
 
 # generate a globally unique node id
-node_identifier = str(uuid4()).replace('-','')
+node_identifier = str(uuid4()).replace('-', '')
 
 # instantiate the blockchain
 
 blockchain = Blockchain()
 
 
-
 @app.route('/mine', methods=['GET'])
 def mine():
     # find the next proof
     last_block = blockchain.last_block
-    last_proof = last_block['proof']
-    proof = blockchain.proof_of_work(last_proof)
+    proof = blockchain.proof_of_work(last_block)
 
     # create a new coin (sender=0)
     blockchain.new_transaction(
@@ -46,7 +44,7 @@ def mine():
 
 
 @app.route('/transactions/new', methods=['POST'])
-def new_transation():
+def new_transaction():
     """
     Example payload:
     {
@@ -89,14 +87,12 @@ def full_chain():
     return jsonify(response), 200
 
 
-
 @app.route('/nodes/register', methods=['POST'])
 def register_nodes():
     values = request.get_json()
 
     if not values:
         return "Bad payload", 400
-
 
     nodes = values.get('nodes')
 
@@ -114,6 +110,23 @@ def register_nodes():
     return jsonify(response), 201
 
 
+@app.route('/nodes/resolve', methods=['GET'])
+def consensus():
+    replaced = blockchain.resolve_conflicts()
+
+    if replaced:
+        response = {
+            'message': 'Our chain was replaced',
+            'new_chain': blockchain.chain
+        }
+    else:
+        response = {
+            'message': 'Our chain is authorative',
+            'chain': blockchain.chain
+        }
+
+    return jsonify(response), 200
+
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5001)

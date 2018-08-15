@@ -85,7 +85,7 @@ class Blockchain:
         return self.chain[-1]
 
 
-    def proof_of_work(self, last_proof):
+    def proof_of_work(self, last_block):
         """
         Simple proof algorithm:
             - let p be the previous proof and p' be the new proof
@@ -95,23 +95,27 @@ class Blockchain:
         :return: <int>
         """
 
+        last_proof = last_block['proof']
+        last_hash = self.hash(last_block)
+
         proof = 0
-        while not self.valid_proof(last_proof, proof):
+        while not self.valid_proof(last_proof, last_hash, proof):
             proof += 1
 
         return proof
 
     @staticmethod
-    def valid_proof(last_proof, proof):
+    def valid_proof(last_proof, last_hash, proof):
         """
         Validates proof: does hash(last_proof, proof) contain 4 leading zeroes?
 
         :param last_proof: <int> Previous proof
+        :param last_hash: <str> Previous hash
         :param proof: <int> Current proof
         :return: <bool> True if correct, False if not
         """
 
-        guess = f'{last_proof}{proof}'.encode()
+        guess = f'{last_proof}{last_hash}{proof}'.encode()
         guess_hash = hashlib.sha256(guess).hexdigest()
         return guess_hash[:4] == "0000"
 
@@ -143,12 +147,13 @@ class Blockchain:
             print(f'{block}')
             print("\n" + "-"*10 + "\n")
 
+            last_hash = self.hash(last_block)
             # validate hash
-            if block['previous_hash'] != self.hash(last_block):
+            if block['previous_hash'] != last_hash:
                 return False
 
             # validate proof of work
-            if not self.valid_proof(last_block['proof'], block['proof']):
+            if not self.valid_proof(last_block['proof'], last_hash, block['proof']):
                 return False
 
             last_block = block
