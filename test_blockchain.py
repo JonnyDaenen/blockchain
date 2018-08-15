@@ -23,9 +23,40 @@ class TestBlockchain(TestCase):
         self.assertEqual(len(self.blockchain.chain), 2)
         self.assertEqual(len(self.blockchain.current_transactions), 0)
 
-    # def test_new_transaction(self):
-    #     self.fail()
-    #
+    def test_new_transaction(self):
+        self.assertEqual(len(self.blockchain.current_transactions), 0)
+
+        # transactions are added
+        self.blockchain.new_transaction("John", "Mary", 10)
+        self.assertEqual(len(self.blockchain.chain), 1)
+        self.assertEqual(len(self.blockchain.current_transactions), 1)
+
+        self.blockchain.new_transaction("John", "Mary", 10)
+        self.assertEqual(len(self.blockchain.chain), 1)
+        self.assertEqual(len(self.blockchain.current_transactions), 2)
+
+        self.blockchain.new_transaction("John", "Mary", 10)
+        self.assertEqual(len(self.blockchain.chain), 1)
+        self.assertEqual(len(self.blockchain.current_transactions), 3)
+
+        # creating a block removes transactions
+        self.blockchain.new_block(proof=1)
+        self.assertEqual(len(self.blockchain.chain), 2)
+        self.assertEqual(len(self.blockchain.current_transactions), 0)
+
+        # transaction is present in the chain
+        self.assertEqual(self.blockchain.chain[1]['transactions'][0]['sender'], "John")
+        self.assertEqual(self.blockchain.chain[1]['transactions'][0]['recipient'], "Mary")
+        self.assertEqual(self.blockchain.chain[1]['transactions'][0]['amount'], 10)
+
+        expected = {
+            'sender': "John",
+            'recipient': "Mary",
+            'amount': 10
+        }
+        self.assertDictEqual(self.blockchain.chain[1]['transactions'][0],expected)
+
+
     # def test_hash(self):
     #     self.fail()
     #
