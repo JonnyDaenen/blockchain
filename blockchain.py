@@ -78,4 +78,37 @@ class Blockchain:
         return self.chain[-1]
 
 
+    def proof_of_work(self, last_proof):
+        """
+        Simple proof algorithm:
+            - let p be the previous proof and p' be the new proof
+            - find a number p' such that hash(pp') contains 4 leading zeroes
+
+        :param last_proof: <int>
+        :return: <int>
+        """
+
+        proof = 0
+        while not self.valid_proof(last_proof, proof):
+            proof += 1
+
+        return proof
+
+
+    @staticmethod
+    def valid_proof(last_proof, proof):
+        """
+        Validates proof: does hash(last_proof, proof) contain 4 leading zeroes?
+
+        :param last_proof: <int> Previous proof
+        :param proof: <int> Current proof
+        :return: <bool> True if correct, False if not
+        """
+
+        guess = f'{last_proof}{proof}'.encode()
+        guess_hash = hashlib.sha256(guess).hexdigest()
+        return guess_hash[:4] == "0000"
+
+
+
 
