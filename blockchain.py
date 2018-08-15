@@ -9,6 +9,8 @@ class Blockchain:
         self.chain = []
         self.current_transactions = []
 
+        self.nodes = set()
+
         # Create the genesis block for this chain
         self.new_block(previous_hash=1, proof=100)
 
@@ -68,7 +70,8 @@ class Blockchain:
 
         # serialize dictionary to a string
         # ! we make sure it is ordered to keep consistency!
-        block_string = json.dumps(block, sort_keys=True).encode()  # QUESTION: why the encode step?
+        # note: byte encoding defaults to UTF-8
+        block_string = json.dumps(block, sort_keys=True).encode()
         return hashlib.sha256(block_string).hexdigest()
 
 
